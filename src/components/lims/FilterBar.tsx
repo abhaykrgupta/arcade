@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { LimsYearBaseData } from "@/types/lims";
 
 interface FilterConfig {
@@ -19,6 +21,10 @@ interface FilterBarProps {
   data: LimsYearBaseData[];
   activeFilters: Record<string, string>;
   onFilterChange: (key: string, value: string) => void;
+  dateFrom: string;
+  dateTo: string;
+  onDateFromChange: (value: string) => void;
+  onDateToChange: (value: string) => void;
 }
 
 function SearchSelect({
@@ -102,15 +108,32 @@ function SearchSelect({
   );
 }
 
-export function FilterBar({ data, activeFilters, onFilterChange }: FilterBarProps) {
+function toDateObj(str: string): Date | null {
+  return str ? new Date(str) : null;
+}
+
+function toDateStr(date: Date | null): string {
+  if (!date) return "";
+  return date.toISOString().split("T")[0];
+}
+
+export function FilterBar({ data, activeFilters, onFilterChange, dateFrom, dateTo, onDateFromChange, onDateToChange }: FilterBarProps) {
   const uniqueOptions = useMemo(() => {
     const options: Record<string, string[]> = {};
+    const selectedBreed = activeFilters["breed_names"];
+
     FILTERS.forEach(({ key }) => {
-      const unique = [...new Set(data.map((item) => item[key]).filter(Boolean))];
+      const source = key === "semen_codes" && selectedBreed
+        ? data.filter((item) => item.breed_names === selectedBreed)
+        : data;
+      const unique = [...new Set(source.map((item) => item[key]).filter(Boolean))];
       options[key] = unique.sort();
     });
     return options;
-  }, [data]);
+  }, [data, activeFilters]);
+
+  const startDate = toDateObj(dateFrom);
+  const endDate = toDateObj(dateTo);
 
   return (
     <div className="flex flex-wrap gap-3 mb-4 p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-md border border-zinc-200 dark:border-zinc-800">
@@ -127,6 +150,30 @@ export function FilterBar({ data, activeFilters, onFilterChange }: FilterBarProp
           />
         </div>
       ))}
+
+      {/* Single date range picker */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+          Date Range
+        </label>
+        <div className="relative">
+          <DatePicker
+            selectsRange
+            startDate={startDate}
+            endDate={endDate}
+            onChange={(dates) => {
+              const [start, end] = Array.isArray(dates) ? dates : [null, null];
+              onDateFromChange(toDateStr(start));
+              onDateToChange(toDateStr(end));
+            }}
+            placeholderText="Select date range..."
+            isClearable
+            dateFormat="yyyy-MM-dd"
+            className="border border-zinc-300 dark:border-zinc-700 rounded-md px-3 py-2 text-sm bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 min-w-[220px]"
+            popperPlacement="bottom-start"
+          />
+        </div>
+      </div>
     </div>
   );
 }

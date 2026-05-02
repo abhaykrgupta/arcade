@@ -1,6 +1,8 @@
 import { fetchYearBaseData } from "@/lib/api";
 import { YearBaseTable } from "@/components/lims/YearBaseTable";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   // Pure Server-Side fetch! Keeps the API key fully secure.
   const result = await fetchYearBaseData();

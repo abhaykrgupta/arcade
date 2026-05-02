@@ -4,7 +4,7 @@ const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
+  <div className="relative w-full overflow-x-auto rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
     <table
       ref={ref}
       className="w-full caption-bottom text-sm"
@@ -18,7 +18,7 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className="bg-zinc-100/50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800" {...props} />
+  <thead ref={ref} className="sticky top-0 z-10 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-800" {...props} />
 ))
 TableHeader.displayName = "TableHeader"
 
@@ -64,7 +64,7 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className="p-4 align-middle [&:has([role=checkbox])]:pr-0 border-r border-zinc-200 dark:border-zinc-800 last:border-r-0"
+    className="py-0 pr-0 pl-2 align-middle [&:has([role=checkbox])]:pr-0 border-r border-zinc-200 dark:border-zinc-800 last:border-r-0"
     {...props}
   />
 ))
